@@ -1,63 +1,28 @@
-# Project governance
+# Reference Types Working Group Governance
 
-The [OCI charter][charter] §5.b.viii tasks an OCI Project's maintainers (listed in the repository's MAINTAINERS file and sometimes referred to as "the TDC", [§5.e][charter]) with:
+## Discussion
 
-> Creating, maintaining and enforcing governance guidelines for the TDC, approved by the maintainers, and which shall be posted visibly for the TDC.
+- Discussions take place during [weekly meetings](./README.md#meetings) and in GitHub issues.
 
-This section describes generic rules and procedures for fulfilling that mandate.
+Working group members and owners shall follow the [OCI code of conduct](https://github.com/opencontainers/.github/blob/master/CODE_OF_CONDUCT.md)
 
-## Proposing a motion
+## Documentation
 
-A maintainer SHOULD propose a motion on the dev@opencontainers.org mailing list (except [security issues](#security-issues)) with another maintainer as a co-sponsor.
+- Consensus shall be documented in the form of GitHub issues that can be referenced in pull requests.
 
-## Voting
+## Owner Duties
 
-Voting on a proposed motion SHOULD happen on the dev@opencontainers.org mailing list (except [security issues](#security-issues)) with maintainers posting LGTM or REJECT.
-Maintainers MAY also explicitly not vote by posting ABSTAIN (which is useful to revert a previous vote).
-Maintainers MAY post multiple times (e.g. as they revise their position based on feedback), but only their final post counts in the tally.
-A proposed motion is adopted if two-thirds of votes cast, a quorum having voted, are in favor of the release.
+The list of current owners shall be recorded in the [CODEOWNERS](./CODEOWNERS) document.
 
-Voting SHOULD remain open for a week to collect feedback from the wider community and allow the maintainers to digest the proposed motion.
-Under exceptional conditions (e.g. non-major security fix releases) proposals which reach quorum with unanimous support MAY be adopted earlier.
+- Owners shall be responsible for overseeing documentation of community decisions, consensus, and resolution of conflicts.
+- Owners shall provide timely feedback to requests for review and promptly merge approved Pull Requests.
+- Owners shall operate in good faith and trust in the community and in each other.
+- Owners shall keep the documentation, issues, and discussion topics as up-to-date as possible.
+- In the event an owner cannot perform their duties or have been inactive for a period of time, an interim or permanent replacement shall be nominated from the community.
+- Consensus on unblocking inactivity or deadlock must be reached in a community meeting and recorded in the meeting minutes.
+- Any member from the community may volunteer to be a owner as long as they pledge to follow the OCI code of conduct and perform these duties.
 
-A maintainer MAY choose to reply with REJECT.
-A maintainer posting a REJECT MUST include a list of concerns or links to written documentation for those concerns (e.g. GitHub issues or mailing-list threads).
-The maintainers SHOULD try to resolve the concerns and wait for the rejecting maintainer to change their opinion to LGTM.
-However, a motion MAY be adopted with REJECTs, as outlined in the previous paragraphs.
+## Conflict Resolution
 
-## Quorum
-
-A quorum is established when at least two-thirds of maintainers have voted.
-
-For projects that are not specifications, a [motion to release](#release-approval) MAY be adopted if the tally is at least three LGTMs and no REJECTs, even if three votes does not meet the usual two-thirds quorum.
-
-## Amendments
-
-The [project governance](#project-governance) rules and procedures MAY be amended or replaced using the procedures themselves.
-The MAINTAINERS of this project governance document is the total set of MAINTAINERS from all Open Containers projects (go-digest, image-spec, image-tools, runC, runtime-spec, runtime-tools, and selinux).
-
-## Subject templates
-
-Maintainers are busy and get lots of email.
-To make project proposals recognizable, proposed motions SHOULD use the following subject templates.
-
-### Proposing a motion
-
-> [{project} VOTE]: {motion description} (closes {end of voting window})
-
-For example:
-
-> [runtime-spec VOTE]: Tag 0647920 as 1.0.0-rc (closes 2016-06-03 20:00 UTC)
-
-### Tallying results
-
-After voting closes, a maintainer SHOULD post a tally to the motion thread with a subject template like:
-
-> [{project} {status}]: {motion description} (+{LGTMs} -{REJECTs} #{ABSTAINs})
-
-Where `{status}` is either `adopted` or `rejected`.
-For example:
-
-> [runtime-spec adopted]: Tag 0647920 as 1.0.0-rc (+6 -0 #3)
-
-[charter]: https://www.opencontainers.org/about/governance
+- Conflicts that cannot be resolved within the group shall be referred to the OCI Technical Oversight Board (TOB) as per [section 5.xv](https://github.com/opencontainers/tob/blob/main/CHARTER.md#5-technical-developer-community) of the TOB Charter.
+- Resolution of the conflict shall be documented on this GitHub respository's issues which can be referred to in a pull request.
