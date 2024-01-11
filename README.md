@@ -33,20 +33,20 @@ Details for issues and pull requests are described in the [contributing guidelin
 
 ## Organizers
 
-- Marcin Franczyk (@mfranczy)
+- Aleksa Sarai (@cyphar)
+- B. Dewayne Branch (@GeoEducator)
+- Bjorn Neergaard (@neersighted)
+- Brandon Mitchell (@sudo-bmitch)
+- Christian Kniep (@ChristianKniep)
+- Dirk Mueller (@dirkmueller)
+- Jason Du (@xdu31)
 - Joe Huang (@chaoyihuang)
-- Zvonko Kaiser (@zvonkok)
+- Marcin Franczyk (@mfranczy)
+- Samuel McGraw (@smcgrawDotNet)
 - Till Wegmüller (@toasterson)
 - Toru Komatsu (@utam0k)
-- B. Dewayne Branch (@GeoEducator)
-- Samuel McGraw (@smcgrawDotNet)
 - Vanessa Sochat (@vsoch)
-- Brandon Mitchell (@sudo-bmitch)
-- Aleksa Sarai (@cyphar)
-- Jason Du (@xdu31)
-- Dirk Mueller (@dirkmueller)
-- Christian Kniep (@ChristianKniep)
-- Bjorn Neergaard (@neersighted)
+- Zvonko Kaiser (@zvonkok)
 
 ## Contact
 
