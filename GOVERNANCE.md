@@ -1,4 +1,4 @@
-# Reference Types Working Group Governance
+# Image Compatibility Working Group Governance
 
 ## Discussion
 
@@ -25,4 +25,4 @@ The list of current owners shall be recorded in the [CODEOWNERS](./CODEOWNERS) d
 ## Conflict Resolution
 
 - Conflicts that cannot be resolved within the group shall be referred to the OCI Technical Oversight Board (TOB) as per [section 5.xv](https://github.com/opencontainers/tob/blob/main/CHARTER.md#5-technical-developer-community) of the TOB Charter.
-- Resolution of the conflict shall be documented on this GitHub respository's issues which can be referred to in a pull request.
+- Resolution of the conflict shall be documented on this GitHub repository's issues which can be referred to in a pull request.
