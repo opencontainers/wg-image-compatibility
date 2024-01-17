@@ -117,7 +117,7 @@ A more nested structure might warrant versioning of namespaces, which would use 
 ```json
 {
     "org.network.b": { 
-         "schemaVersion": "1.0.0",
+         "version": "1.0.0",
          "annotations": {
            "mtu": "1350",
            "vxlan": "false",        
@@ -147,7 +147,7 @@ Generally speaking, any library or command line client would receive a request f
 
 - **CompatibilityCheck**: (checking plugin) the main entrypoint, which would use some number of extraction plugins (depending on needed system information) to make an assessment of compatibility.
 - **Extract**: (extraction plugin) would be called by name by a compatibility check, and is expected to return a predictable structure of metadata for use by the compatibility checking plugin.
-- **GenerateManifest**: (creation plugin) Taking as input a namespace for a group, schemaVersion, and attributes, and generating an artifact or adding metadata to an image manifest (depending on the chosen path).
+- **GenerateManifest**: (creation plugin) Taking as input a namespace for a group, version, and attributes, and generating an artifact or adding metadata to an image manifest (depending on the chosen path).
 
 The details of these plugins and function interfaces should not be a prime concern for the document here, but by a follow up group. The above are provided for examples only. For the above, the compatibility interest groups likely define the checking plugins, and the OCI working groups (with expert groups) provide the underlying plugins for extraction or manifest generation.  A compatibility interest group could also provide an extraction plugin, if appropriate.
 
