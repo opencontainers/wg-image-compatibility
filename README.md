@@ -1,4 +1,4 @@
-# OCI Working Group: Template
+# OCI Working Group: Image Compatibility
 
 ## Mission Statement
 
