@@ -4,7 +4,7 @@ The purpose of the compatibility artifact is to describe compatibility requireme
 
 This proposal is based on proposal B, F and G with new ideas, some description is kept unchanged and borrowed from these original proposals.
 
-The design goal is to avoid over-flexible speficication, and avoid abusing the specification.
+The design goal is to avoid over-flexible specification, and avoid abusing the specification.
 
 It is NOT TO store variation of user configuration of applications in the compatibility artifact.
 
@@ -14,7 +14,7 @@ The second part focus on how the compatibility requirements to be described in f
 
 The third part provides some examples for easy to follow the ideas.
 
-The fourth part discusses how the comaptibility spec colloborates with NFD community.
+The fourth part discusses how the compatibility spec collaborates with NFD community.
 
 The fifth part describes how the compatibility artifact could be linked to the image.
 
@@ -70,7 +70,7 @@ Schema:
 
     This REQUIRED property describes compatibility requirements in one compatibility set.
 
-    If one of the compatibility set passes the compatibility check against the target node, that means the node is compatibile with the image.
+    If one of the compatibility set passes the compatibility check against the target node, that means the node is compatible with the image.
 
     There are three category key-value pair inside the compatibility set.
 
@@ -78,11 +78,11 @@ Schema:
 
       This REQUIRED property describes a feature compatibility requirement on the target host, the field is named with NFD feature label.
 
-      The value of compatibility field in the compatibility artifact SHOULD be described in contiguous or discontiguous range if the value discovered on nodes can be different.
+      The value of compatibility field in the compatibility artifact SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different.
 
-      It's the tool's responsibility to intepret the value and matching critriea with the value discovered from the node via NFD.
+      It's the tool's responsibility to interpret the value and matching criteria with the value discovered from the node via NFD.
 
-      Inevitablely, some compatibility fields MAY be duplicated among compatibility sets.
+      Inevitably, some compatibility fields MAY be duplicated among compatibility sets.
 
       The value type of this field is STRING.
 
@@ -98,7 +98,7 @@ Schema:
 
       If compatibility sets have same score, that means any of these compatibility sets pass the compatibility check is successful in matching the compatibility requirements.
 
-      The compatibility-score is used for selecting optimal image in descending order for those compaibility sets pass the comaptibility check.
+      The compatibility-score is used for selecting optimal image in descending order for those compatibility sets pass the compatibility check.
 
       The value type of this field is INT.
 
@@ -110,7 +110,7 @@ Schema:
 
 ## Artifact example of use
 
-### Example - image is comaptible with different hardware combinations
+### Example - image is compatible with different hardware combinations
 
 ```json
 {
@@ -138,7 +138,7 @@ Schema:
 }
 ```
 
-### Example - image is comaptible with optimal hardwares
+### Example - image is compatible with optimal hardwares
 
 ```json
 {
@@ -185,9 +185,9 @@ Schema:
 
 If the field is required in image compatibility artifact, but does not present in NFD labels, the new feature lable should be discussed and contributed into NFD.
 
-It's expected that NFD feature lables definition and node feature discovering could be an indepenedent component in NFD, and could be consumed by different consumers.
+It's expected that NFD feature lables definition and node feature discovering could be an independent component in NFD, and could be consumed by different consumers.
 
-To avoid over-flexible speficication, and avoid abusing the specification, a way to limit the freedom is needed.
+To avoid over-flexible specification, and avoid abusing the specification, a way to limit the freedom is needed.
 
 ## Artifact Discovery
 
