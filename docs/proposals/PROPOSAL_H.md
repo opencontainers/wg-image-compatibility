@@ -74,9 +74,8 @@ Schema:
 
     There are three category key-value pair inside the compatibility set.
 
-
     - **`compatibility feature field`**
-    
+
       This REQUIRED property describes a feature compatibility requirement on the target host, the field is named with NFD feature label.
 
       The value of compatibility field in the compatibility artifact SHOULD be described in contiguous or discontiguous range if the value discovered on nodes can be different.
@@ -104,7 +103,7 @@ Schema:
       The value type of this field is INT.
 
     - **`annotation field`**
-   
+
       This OPTIONAL property is a field to describe human readable information regarding to the compatibility set.
 
       The value type of this field is STRING.
@@ -195,7 +194,6 @@ To avoid over-flexible speficication, and avoid abusing the specification, a way
 The subject field should be used to associate the compatibility artifact with target image. The referrers API should be used to discover artifacts.
 
 The client will query for an artifact using the referrers response, selecting the entry with a matching artifactType and the most recent "created" timestamp.
-
 
 ## Requirements
 
