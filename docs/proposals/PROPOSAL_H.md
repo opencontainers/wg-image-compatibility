@@ -182,10 +182,6 @@ Schema:
 }
 ```
 
-The compatibility-score is used for selecting optimal image in descending order for those compaibility sets passes the comaptibility check.
-
-Inevitablely, some compatibility fields will be duplicated among compatibility sets.
-
 ## Compatibility and NFD filed labels
 
 If the field is required in image compatibility artifact, but does not present in NFD labels, the new feature lable should be discussed and contributed into NFD.
