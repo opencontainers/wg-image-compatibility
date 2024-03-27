@@ -56,7 +56,7 @@ The schema version is to use string semver instead of int version, to help tool 
 
 The media type is defined as nfd.image-compatibility.spec, in order to be defined agnostic to cluster management software.
 
-## NFD feature labels based image compatibility spec
+## image compatibility spec
 
 The spec structure is quite simple, a flat json file. NFD means the Kubernetes node feature discovering SIG.
 
@@ -69,31 +69,44 @@ Schema:
   - **`compatibility set`** *list of compatibility requirement*
 
     This REQUIRED property describes compatibility requirements in one compatibility set.
+
     If one of the compatibility set passes the compatibility check against the target node, that means the node is compatibile with the image.
+
     There are three category key-value pair inside the compatibility set.
 
 
     - **`compatibility feature field`**
     
       This REQUIRED property describes a feature compatibility requirement on the target host, the field is named with NFD feature label.
+
       The value of compatibility field in the compatibility artifact SHOULD be described in contiguous or discontiguous range if the value discovered on nodes can be different.
+
       It's the tool's responsibility to intepret the value and matching critriea with the value discovered from the node via NFD.
+
       Inevitablely, some compatibility fields MAY be duplicated among compatibility sets.
+
       The value type of this field is STRING.
 
     - **`compatibility score field`**
 
       This OPTIONAL property describes the score of the compatibility set.
+
       Only one compatibility score filed in one compatibility set.
+
       The highest score of the compatibility set means this compatibility set is the most optimal one.
+
       If this field is not present, the score of this compatibility set is 0.
+
       If compatibility sets have same score, that means any of these compatibility sets pass the compatibility check is successful in matching the compatibility requirements.
+
       The compatibility-score is used for selecting optimal image in descending order for those compaibility sets pass the comaptibility check.
+
       The value type of this field is INT.
 
     - **`annotation field`**
    
       This OPTIONAL property is a field to describe human readable information regarding to the compatibility set.
+
       The value type of this field is STRING.
 
 ## Artifact example of use
@@ -173,7 +186,7 @@ The compatibility-score is used for selecting optimal image in descending order 
 
 Inevitablely, some compatibility fields will be duplicated among compatibility sets.
 
-## Compatibility NFD filed labels
+## Compatibility and NFD filed labels
 
 If the field is required in image compatibility artifact, but does not present in NFD labels, the new feature lable should be discussed and contributed into NFD.
 
