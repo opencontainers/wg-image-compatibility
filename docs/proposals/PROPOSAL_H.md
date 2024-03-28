@@ -2,7 +2,7 @@
 
 The purpose of the compatibility artifact is to describe compatibility requirements for container images to run on a host.
 
-This proposal is based on proposal B, F and G with new ideas, some description is kept unchanged and borrowed from these original proposals.
+This proposal is based on proposal A, B, C, D, E, F and G with new ideas; some description is kept unchanged and borrowed from these original proposals.
 
 The design goal is to avoid over-flexible specification, and avoid abusing the specification.
 
@@ -10,9 +10,9 @@ It is NOT TO store variation of user configuration of applications in the compat
 
 The first part describes the compatibility artifact manifest.
 
-The second part focus on how the compatibility requirements to be described in flat format, including image selection and validation.
+The second part focuses on how the compatibility requirements are to be described in a flat format, including metadata attributes for image selection and validation.
 
-The third part provides some examples for easy to follow the ideas.
+The third part provides some examples to make it easy to follow these ideas.
 
 The fourth part discusses how the compatibility spec collaborates with NFD community.
 
@@ -36,7 +36,7 @@ The artifact manifest contains ONLY one blob.
   },
   "layers": [
     {
-      "mediaType": "application/nfd.image-compatibility.spec.v1alpha1+json",
+      "mediaType": "application/vnd.oci.image-compatibility.spec.v1+json",
       "digest": "sha256:4a47f8ae4c713906618413cb9795824d09eeadf948729e213a1ba11a1e31d052",
       "size": 1710,
       "annotations": {
@@ -54,7 +54,7 @@ The new artifact type for image compatibility MUST be referenced in OCI document
 
 The schema version is to use string semver instead of int version, to help tool in content deserialization.
 
-The media type is defined as nfd.image-compatibility.spec, in order to be defined agnostic to cluster management software.
+The media type is defined as vnd.oci.image-compatibility.spec, in order to be defined agnostic to cluster management software.
 
 ## image compatibility spec
 
@@ -66,7 +66,7 @@ Schema:
 
   This REQUIRED property describes all image compatibility sets, contains at least one compatibility set.
 
-  - **`compatibility set`** *list of compatibility requirement*
+  - **`compatibility set`** *list of compatibility requirements*
 
     This REQUIRED property describes compatibility requirements in one compatibility set.
 
@@ -90,15 +90,15 @@ Schema:
 
       This OPTIONAL property describes the score of the compatibility set.
 
-      Only one compatibility score filed in one compatibility set.
+      There is only one compatibility score filed allowed in one compatibility set.
 
       The highest score of the compatibility set means this compatibility set is the most optimal one.
 
       If this field is not present, the score of this compatibility set is 0.
 
-      If compatibility sets have same score, that means any of these compatibility sets pass the compatibility check is successful in matching the compatibility requirements.
+      If compatibility sets have the same score, that means any of these compatibility sets pass the compatibility check is successful in matching the compatibility requirements.
 
-      The compatibility-score is used for selecting optimal image in descending order for those compatibility sets pass the compatibility check.
+      The compatibility-score is used for selecting optimal image or optimal node in descending order for those compatibility sets pass the compatibility check.
 
       The value type of this field is INT.
 
@@ -180,6 +180,16 @@ Schema:
   ]
 }
 ```
+
+## Alternative place to hold compatibility set
+
+Considering the compatibilities are composed of a list of compatibility set, just similar as the idea in proposal E, the platform.features could be reused. 
+
+Each compatibility set will be encoded into a string, then the platform.features can hold all the compatibility artifact content, the downside is the platform.features content is hard to read for human.
+
+Then it's the image author's(or image provider's) freedom to use standalone artifact or platform.features to express the compatibility requirements, the format will be kept same.
+
+To reduce the load to registry, if compatibilities are stored in platform.features(a new filed inside comaptibility set can be used to identify this case), no further api request should be sent to registry to discover the comaptibility artifact. 
 
 ## Compatibility and NFD filed labels
 
