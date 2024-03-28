@@ -14,7 +14,7 @@ The second part focuses on how the compatibility requirements are to be describe
 
 The third part provides some examples to make it easy to follow these ideas.
 
-The fourth part discusses how the compatibility spec collaborates with NFD community.
+The fourth part discusses how the compatibility spec collaborates with the Node Feature Discovery (NFD) community.
 
 The fifth part describes how the compatibility artifact could be linked to the image.
 
@@ -62,7 +62,7 @@ The spec structure is quite simple, a flat json file. NFD means the Kubernetes n
 
 Schema:
 
-- **`compatibilities`** *list of compatibility set*
+- **`compatibilities`** *list of compatibility sets*
 
   This REQUIRED property describes all image compatibility sets, contains at least one compatibility set.
 
@@ -70,7 +70,7 @@ Schema:
 
     This REQUIRED property describes compatibility requirements in one compatibility set.
 
-    If one of the compatibility set passes the compatibility check against the target node, that means the node is compatible with the image.
+    If one of the compatibility sets passes the compatibility check against the target node, that means the node is compatible with the image.
 
     There are three category key-value pair inside the compatibility set.
 
@@ -138,7 +138,7 @@ Schema:
 }
 ```
 
-### Example - image is compatible with optimal hardwares
+### Example - image is compatible with optimal hardware
 
 ```json
 {
