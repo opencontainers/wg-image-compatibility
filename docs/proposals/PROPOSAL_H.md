@@ -183,13 +183,13 @@ Schema:
 
 ## Alternative place to hold compatibility set
 
-Considering the compatibilities are composed of a list of compatibility set, just similar as the idea in proposal E, the platform.features could be reused. 
+Considering the compatibilities are composed of a list of compatibility set, just similar as the idea in proposal E, the platform.features could be reused.
 
 Each compatibility set will be encoded into a string, then the platform.features can hold all the compatibility artifact content, the downside is the platform.features content is hard to read for human.
 
 Then it's the image author's(or image provider's) freedom to use standalone artifact or platform.features to express the compatibility requirements, the format will be kept same.
 
-To reduce the load to registry, if compatibilities are stored in platform.features(a new filed inside comaptibility set can be used to identify this case), no further api request should be sent to registry to discover the comaptibility artifact. 
+To reduce the load to registry, if compatibilities are stored in platform.features(a new filed inside comaptibility set can be used to identify this case), no further api request should be sent to registry to discover the comaptibility artifact.
 
 ## Compatibility and NFD filed labels
 
