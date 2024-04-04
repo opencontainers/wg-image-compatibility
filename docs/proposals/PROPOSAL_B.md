@@ -138,83 +138,83 @@ A new functionality to represent compatibility by DAG(s) has been added.
 
 Schema:
 
-- **`spec`** *string-object map*
+- **`spec`** _string-object map_
 
   This REQUIRED property describes the compatibility specification.
 
-  - **`compatibilities`** *array of objects*
+  - **`compatibilities`** _array of object_
 
     This REQUIRED property is a list of compatibility domains.
 
-    - **`id`** *string*
+    - **`id`** _string_
 
       This REQUIRED property represents the compatibility identifier.
 
-    - **`domain`** *string*
+    - **`domain`** _string_
 
       This REQUIRED property represents the compatibility domain. Domains are used to identify origin of interest groups and their functionality. The name must be a valid domain name.
 
-    - **`attributes`** *object*
+    - **`attributes`** _object_
 
       This REQUIRED property specifies the domain attributes that are used for host validations. For instance `kernel.version`, `os.version` etc.
       Domain attributes should be checked on the domain documentation page.
 
-    - **`annotations`** *string-string map*
+    - **`annotations`** _string-string map_
 
       This OPTIONAL property describes user defined annotations.
 
-  - **`relations`** *object*
+  - **`relations`** _object_
 
     This OPTIONAL property specifies relations between compatibilities.
 
-    - **`graphs`** - *string-object map*
+    - **`graphs`** - _string-object map_
 
       This OPTIONAL property specify the compatibility graphs.
 
-      - **`<graphName>`** *object*
+      - **`<graphName>`** _object_
 
         This REQUIRED property specifies the name of the graph, which is later referenced by the `spec.validationCriteria.graphs` field.
 
-        - **`annotations`** *string-string map*
+        - **`annotations`** _string-string map_
 
         This OPTIONAL property describes user defined annotations.
 
-        - **`edges`** *array of objects*
+        - **`edges`** _array of object_
 
           This REQUIRED property describes relation between compatibility nodes.
 
-          - **`from`** *string*
+          - **`from`** _string_
 
             This REQUIRED property references a source compatibility defined in the `spec.compatibilities` field.
             The compatibility MUST be referenced by `id`.
 
-          - **`to`** *object*
+          - **`to`** _object*
 
             This REQUIRED property references a target compatibility defined in the `spec.compatibilities.id` field.
 
-            - **`compatibilities`** *array of strings*
+            - **`compatibilities`** _array of string_
 
               This REQUIRED property references compatibility ids from `spec.compatibilities.<n>.id`.
 
-            - **`condition`** *string*
+            - **`condition`** _string_
 
               This REQUIRED property specify the compatibility validation rule.
               Allowed values: _allOf_ - all referenced compatibilities must pass; _oneOf_ - one referenced compatibility must pass from the list, _noneOf_ - none referenced compatibility can pass.
 
-      - **`validationCriteria`** *array of objects*
+      - **`validationCriteria`** _array of object_
 
         This REQUIRED property defines compatibility criteria.
 
-        - **`graphs`** *array of strings*
+        - **`graphs`** _array of string_
 
           This REQUIRED property references graphs names from `spec.relations.graphs`. The graphs are used to validate the compatibility.
 
-        - **`condition`** *string*
+        - **`condition`** _string_
 
           This REQUIRED property specify the compatibility validation rule.
           Allowed values: _allOf_ - all referenced graphs must pass; _oneOf_ - one referenced graph must pass from the list.
 
-        - **`annotations`** *string-string map*
+        - **`annotations`** _string-string map_
 
           This OPTIONAL property describes user defined annotations.
 
@@ -442,7 +442,7 @@ Thus the following scenarios are out of the scope:
   - etc.
 
 All other uses cases that are not mentioned in [Goals](#goals) require compatibility information should implement their own logic, algorithms or helpers in separate projects.
-As mentioned in the [OCI Compatibility Tool](#oci-compatibility-tool) section: *The compatibility tool maintained by OCI should be very minimal in scope and it should export pkgs for external tools so they can cover their own use cases.*
+As mentioned in the [OCI Compatibility Tool](#oci-compatibility-tool) section: _The compatibility tool maintained by OCI should be very minimal in scope and it should export pkgs for external tools so they can cover their own use cases._
 
 ## Requirements
 
@@ -464,7 +464,7 @@ Based on [REQUIREMENTS.md](../REQUIREMENTS.md)
 ### Domain Architect
 
 1. [x] As a domain architect I want a process to share my knowledge about \<niche topic\> compatibility with some compatibility interest group. (_Can be done over annotations field in the proposed specification_)
-2. [x] As a domain architect I don't want to have to understand containers or develop tools for them to share this knowledge.
+1. [x] As a domain architect I don't want to have to understand containers or develop tools for them to share this knowledge.
 
 ### Tool Writer
 
