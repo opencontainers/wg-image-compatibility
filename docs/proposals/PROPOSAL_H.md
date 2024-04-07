@@ -8,11 +8,11 @@ The design goal is to avoid over-flexible specification, and avoid abusing the s
 
 It is NOT TO store variation of user configuration of applications in the compatibility artifact.
 
-The first part describes the compatibility artifact, including manifest, comaptibility spec and examples.
+The first part describes the compatibility artifact, including manifest, compatibility spec and examples.
 
-The second part talks about compatibilities embeded inside platform object.
+The second part talks about compatibilities embedded inside platform object.
 
-The third part dicusses the flexibility of the proposal.
+The third part discusses the flexibility of the proposal.
 
 The fourth part compares the pros. and cons. of these two options.
 
@@ -64,11 +64,11 @@ The spec structure is quite simple, a flat json file.
 
 Schema:
 
-- **`compatibilities`** *list of compatibility sets*
+- **`compatibilities`** _list of compatibility sets_
 
   This REQUIRED property describes all image compatibility sets, contains at least one compatibility set.
 
-  - **`compatibility set`** *list of compatibility requirements*
+  - **`compatibility set`** _list of compatibility requirements_
 
     This REQUIRED property describes compatibility requirements in one compatibility set.
 
@@ -78,11 +78,11 @@ Schema:
 
     - **`compatibility feature field`**
 
-      This REQUIRED property describes a feature compatibility requirement on the target host, the field is named with OCI feature label.
+      This REQUIRED property describes a feature compatibility requirement on the target host, the field accepts OCI and community defined labels.
 
       The value of compatibility field in the compatibility artifact SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different.
 
-      It's the tool's responsibility to interpret the value of OCI feature label, and matching criteria with the value discovered from the node via NFD tool or other tool. NFD means the Kubernetes node feature discovering SIG.
+      It's the tool's responsibility to interpret the value of OCI or community defined feature label, and matching criteria with the value discovered from the node via NFD tool or other tool. NFD means the Kubernetes node feature discovering SIG.
 
       Inevitably, some compatibility fields MAY be duplicated among compatibility sets.
 
@@ -106,7 +106,7 @@ Schema:
 
     - **`annotation field`**
 
-      This OPTIONAL property is a field to describe human readable information regarding to the compatibility set.
+      This OPTIONAL property is a field to describe human-readable information regarding to the compatibility set.
 
       The value type of this field is STRING.
 
@@ -126,12 +126,12 @@ All fields in this section are only for examples.
       "oci.kernel.configurations": "PREEMPT,",
       "oci.kernel.versions": "[4.19, 5.16)",
       "oci.os.glibc": "[2.31, 2.37]",
-      "oci.pci.devices": "15B3.020D,",
+      "oci.pci.devices": "15B3.020D,"
     },
     {
       "oci.cpu.vendor": "AuthenticAMD",
       "oci.cpu.features": "FPHP,",
-      "oci.kernel.selinux": "false"
+      "oci.kernel.selinux": "false",
       "oci.kernel.configurations": "PREEMPT,",
       "oci.kernel.versions": "[4.19, 5.16)",
       "oci.os.glibc": "[2.31, 2.37]",
@@ -150,13 +150,13 @@ All fields in this section are only for examples.
     {
       "oci.cpu.vendor": "GenuineIntel",
       "oci.cpu.features": "AMXFP16,",
-      "oci.kernel.selinux": "false"
+      "oci.kernel.selinux": "false",
       "oci.kernel.configurations": "PREEMPT,",
       "oci.kernel.versions": "[4.19, 5.16)",
       "oci.os.glibc": "[2.31, 2.37]",
       "oci.os.openmpi": "[4.1.6, 4.1.6]",
       "oci.pci.devices": "15B3.020D,",
-      "compatibility-score": 50,
+      "compatibility-score": 50
     },
     {
       "oci.cpu.vendor": "GenuineIntel",
@@ -167,7 +167,7 @@ All fields in this section are only for examples.
       "oci.os.glibc": "[2.31, 2.37]",
       "oci.os.openmpi": "[4.1.6, 4.1.6]",
       "oci.pci.devices": "15B3.020D,",
-      "oci.compatibility-score": 100,
+      "oci.compatibility-score": 100
     },
     {
       "oci.cpu.vendor": "AuthenticAMD",
@@ -185,42 +185,46 @@ All fields in this section are only for examples.
 }
 ```
 
-## Compatibilities Embeded Inside Platform Object
+## Compatibilities Embedded Inside Platform Object
 
 ### Extend Platform Object with New Compatibilities Field
 
 Add a new field in platform object in [image index](https://github.com/opencontainers/image-spec/blob/main/image-index.md#image-index-property-descriptions).
 
-  - **`platform`** *object*
+The compatibilities author should be aware that the maximal size of image index is 4 MiB.
+
+- **`manifests`** _array of objects_
+
+  - **`platform`** _object_
 
     This OPTIONAL property describes the minimum runtime requirements of the image.
     This property SHOULD be present if its target is platform-specific.
 
-    - **`architecture`** *string*
+    - **`architecture`** _string_
 
-    - **`variant`** *string*
+    - **`variant`** _string_
 
-    - **`os`** *string*
+    - **`os`** _string_
 
-    - **`os.version`** *string*
+    - **`os.version`** _string_
 
-    - **`os.features`** *array of strings*
+    - **`os.features`** _array of strings_
 
-    - **`features`** *array of strings*
+    - **`features`** _array of strings_
 
-    - **`compatibilities`** *list of map*
+    - **`compatibilities`** _array of string-string maps_
 
       This new OPTIONAL property describes a list of compatibility sets, contains at least one compatibility set. Same definition as that in Image Compatibility Spec.
 
-### Migration and Deprecation
+### Deprecation Path
 
-The platform.os.version, platform.os.features and platform.features are expected to be migrated to platform.compatibilites fields.
+The platform.os.version, platform.os.features and platform.features are expected to be moved to platform.compatibilities fields.
 
-It may take years for the migration.
+The old usage of these fields is deprecated at some point, but that's often reactionary after popular builders stop using these fields.
 
-The deprecation for these fields will start with pre-notification and migration transition period.
+Backwards compatibility or graceful degradation should be ensured for these fields where possible with either old images, old builders, and/or old runtimes.
 
-Before all runtimes' migration finished, these fields should still be valid.
+It may take years for the deprecation.
 
 ## Flexibility for Different Purpose
 
@@ -228,49 +232,49 @@ It's the image author's (or image provider's) freedom to use standalone artifact
 
 The subject field should be used to associate the compatibility artifact with target image. The referrers API should be used to discover artifacts.
 
-The client will query for an artifact using the referrers response, selecting the entry with a matching artifactType and the most recent "created" timestamp.
+The client will query for an artifact using the referrers' response, selecting the entry with a matching artifactType and the most recent "created" timestamp.
 
-If platform.compatibilities is detected and not empty, then runtime is not required to send referrs API to query compatibility artifact.
+If platform.compatibilities is detected and not empty, then runtime is not required to send referrers API to query compatibility artifact.
 
-If there is no platform.compatibilities, or the content of platform.compatibilities is  empty, then runtime should send referrs API to registry to query compatibility artifact.
+If there is no platform.compatibilities, or the content of platform.compatibilities is empty, it should be configurable whether to send referrers API to registry to query compatibility artifact.
 
-## Pros. and Cons. Comparation
+## Pros. and Cons. Comparison
 
 ### Pros. and Cons. of Compatibility Artifact
 
 It's possible to update compatibility independently without having to re-release and re-distribute image.
 
-In some vertical industries, re-distributing image means repeating release cycle to production site, it may take several weeks to several months for complex applications, very time consuming and high cost.
+In some vertical industries, re-distributing image means repeating release cycle to production site, it may take several weeks to several months for complex applications, very time-consuming and high cost.
 
 The application using new image has to pass series tests inside vendor's lab and then customer's lab, and then roll out in production site gradually. Tests may include function, performance, reliability, security, inter-working etc.
 
-The cons. of compatibility artifact is, if it's used for image selection or scheduling decision, additional referrs API request should be sent to registry.
+The cons. of compatibility artifact is, if it's used for image selection or scheduling decision, additional referrers API request should be sent to registry.
+
+When the compatibility artifact is used for validation purpose, it can be processed without runtime image selection or scheduling decision being involved.
 
 ### Pros. and Cons. of platform.compatibilities
 
-Obviously current API interaction with registry can retrieve the compatibility requirements directly, no additional referrs API request is needed.
+Obviously current API interaction with registry can retrieve the compatibility requirements directly, no additional referrers API request is needed.
 
 Modification to the platform.compatibilities will alter the image index content.
 
-Image shipping usually will try to ensure the integrity of the image, and prevent unauthorized tampering. Image index content update will require re-distribute the image for supply chain security.
+Image shipping will usually try to ensure the integrity of the image, and prevent unauthorized tampering, thus image index content update will require re-distribute the image for supply chain security.
 
 ## Compatibility and NFD filed labels
 
 The proposal itself does not intend to define concrete compatibility field labels, it should be a task for separate proposals.
 
-To free the tools implementation, and make sure the existing os.version, os.features, platform.features can be easily migrated and smoothly deprecated, it's reasonable that minimal set of OCI compatibility fields should be defined in OCI.
+To free the tools' implementation, and make sure the existing os.version, os.features, platform.features can be smoothly deprecated, and reduce the sync. effort between OCI and NFD, it's reasonable just to define minimal set of OCI compatibility fields.
 
 These field labels could be easily mapped or translated to NFD field labels.
 
-Because the value of compatibility field SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different, NFD labels are dynamicly created according to node features, it's not one to one mapping.
+Because the value of compatibility field SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different, NFD labels are dynamically created according to node features, it's not one to one mapping.
 
-For example, oci.kernel.configurations may containes serveral boot configurations in a single string, but in NFD, different lables like kernel-config.PREEMPT, kernel-config.intel_iommu may be applied.
+For example, oci.kernel.configurations may contain several boot configurations in a single string, but in NFD, several labels like kernel-config.PREEMPT, kernel-config.intel_iommu may be applied.
 
-If the field is required in image compatibilities, but does not present in NFD labels, the new feature lable should be discussed and contributed into NFD.
+If the field is required in image compatibilities, but does not present in NFD labels, the new feature label should be discussed and contributed into NFD.
 
-It's expected that NFD feature lables definition and node feature discovering could be an independent component in NFD, and could be consumed by different consumers.
-
-SHOULD customized compatibility field labels be allowed in different industry? It's an open topic.
+It's expected that NFD feature labels definition and node feature discovering could be an independent component in NFD, and could be consumed by different consumers.
 
 To avoid over-flexible specification, and avoid abusing the specification, a way to limit the freedom is needed.
 
