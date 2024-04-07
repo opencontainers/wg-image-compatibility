@@ -1,6 +1,6 @@
-# Proposal H - compatibility artifact in flat format
+# Proposal H - compatibilities in flat format
 
-The purpose of the compatibility artifact is to describe compatibility requirements for container images to run on a host.
+The purpose of the proposal is to describe compatibility requirements for container images to run on a host.
 
 This proposal is based on proposal A, B, C, D, E, F and G with new ideas; some description is kept unchanged and borrowed from these original proposals.
 
@@ -8,19 +8,21 @@ The design goal is to avoid over-flexible specification, and avoid abusing the s
 
 It is NOT TO store variation of user configuration of applications in the compatibility artifact.
 
-The first part describes the compatibility artifact manifest.
+The first part describes the compatibility artifact, including manifest, comaptibility spec and examples.
 
-The second part focuses on how the compatibility requirements are to be described in a flat format, including metadata attributes for image selection and validation.
+The second part talks about compatibilities embeded inside platform object.
 
-The third part provides some examples to make it easy to follow these ideas.
+The third part dicusses the flexibility of the proposal.
 
-The fourth part discusses how the compatibility spec collaborates with the Node Feature Discovery (NFD) community.
+The fourth part compares the pros. and cons. of these two options.
 
-The fifth part describes how the compatibility artifact could be linked to the image.
+The fifth part discusses how the compatibility spec collaborates with the Node Feature Discovery (NFD) community.
 
 Finally, the last part shows the addressed usage scenarios.
 
-## Artifact Manifest
+## Compatibility Artifact
+
+### Artifact Manifest
 
 The artifact manifest contains ONLY one blob.
 
@@ -56,9 +58,9 @@ The schema version is to use string semver instead of int version, to help tool 
 
 The media type is defined as vnd.oci.image-compatibility.spec, in order to be defined agnostic to cluster management software.
 
-## image compatibility spec
+### Image Compatibility Spec
 
-The spec structure is quite simple, a flat json file. NFD means the Kubernetes node feature discovering SIG.
+The spec structure is quite simple, a flat json file.
 
 Schema:
 
@@ -76,11 +78,11 @@ Schema:
 
     - **`compatibility feature field`**
 
-      This REQUIRED property describes a feature compatibility requirement on the target host, the field is named with NFD feature label.
+      This REQUIRED property describes a feature compatibility requirement on the target host, the field is named with OCI feature label.
 
       The value of compatibility field in the compatibility artifact SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different.
 
-      It's the tool's responsibility to interpret the value and matching criteria with the value discovered from the node via NFD.
+      It's the tool's responsibility to interpret the value of OCI feature label, and matching criteria with the value discovered from the node via NFD tool or other tool. NFD means the Kubernetes node feature discovering SIG.
 
       Inevitably, some compatibility fields MAY be duplicated among compatibility sets.
 
@@ -90,7 +92,7 @@ Schema:
 
       This OPTIONAL property describes the score of the compatibility set.
 
-      There is only one compatibility score filed allowed in one compatibility set.
+      There is only one compatibility score field allowed in one compatibility set.
 
       The highest score of the compatibility set means this compatibility set is the most optimal one.
 
@@ -108,102 +110,169 @@ Schema:
 
       The value type of this field is STRING.
 
-## Artifact example of use
+### Artifact example of use
 
-### Example - image is compatible with different hardware combinations
+All fields in this section are only for examples.
+
+#### Example - image is compatible with different hardware combinations
 
 ```json
 {
   "compatibilities": [
     {
-      "cpu-model.vendor_id": "GenuineIntel",
-      "cpu-cpuid.AVX512FP16": "true",
-      "kernel-selinux.enabled": "false",
-      "kernel-config.PREEMPT": "true",
-      "kernel-version.full": "[4.19, 5.16)",
-      "system.glibc": "[2.31, 2.37]",
-      "pci-15B3-020D.present": "true",
+      "oci.cpu.vendor": "GenuineIntel",
+      "oci.cpu.features": "AVX512FP16,",
+      "oci.kernel.selinux": "false",
+      "oci.kernel.configurations": "PREEMPT,",
+      "oci.kernel.versions": "[4.19, 5.16)",
+      "oci.os.glibc": "[2.31, 2.37]",
+      "oci.pci.devices": "15B3.020D,",
     },
     {
-      "cpu-model.vendor_id": "AuthenticAMD",
-      "cpu-cpuid.FPHP": "true",
-      "kernel-selinux.enabled": "false",
-      "kernel-config.PREEMPT": "true",
-      "kernel-version.full": "[4.19, 5.16)",
-      "system.glibc": "[2.31, 2.37]",
-      "pci-1002-67ff.present": "true",
+      "oci.cpu.vendor": "AuthenticAMD",
+      "oci.cpu.features": "FPHP,",
+      "oci.kernel.selinux": "false"
+      "oci.kernel.configurations": "PREEMPT,",
+      "oci.kernel.versions": "[4.19, 5.16)",
+      "oci.os.glibc": "[2.31, 2.37]",
+      "oci.pci.devices": "1002.67ff",
       "annotation": "only work with AMD CPU and AMD GPU"
     }
   ]
 }
 ```
 
-### Example - image is compatible with optimal hardware
+#### Example - image is compatible with optimal hardware
 
 ```json
 {
   "compatibilities": [
     {
-      "cpu-model.vendor_id": "GenuineIntel",
-      "cpu-cpuid.AMXFP16": "true",
-      "kernel-selinux.enabled": "false",
-      "kernel-config.PREEMPT": "true",
-      "kernel-version.full": "[4.19, 5.16)",
-      "system.glibc": "[2.31, 2.37]",
-      "system.openmpi": "[4.1.6, 4.1.6]",
-      "pci-15B3-019D.present": "true",
+      "oci.cpu.vendor": "GenuineIntel",
+      "oci.cpu.features": "AMXFP16,",
+      "oci.kernel.selinux": "false"
+      "oci.kernel.configurations": "PREEMPT,",
+      "oci.kernel.versions": "[4.19, 5.16)",
+      "oci.os.glibc": "[2.31, 2.37]",
+      "oci.os.openmpi": "[4.1.6, 4.1.6]",
+      "oci.pci.devices": "15B3.020D,",
       "compatibility-score": 50,
     },
     {
-      "cpu-model.vendor_id": "GenuineIntel",
-      "cpu-cpuid.AVX512FP16": "true",
-      "kernel-selinux.enabled": "false",
-      "kernel-config.PREEMPT": "true",
-      "kernel-version.full": "[4.19, 5.16)",
-      "system.glibc": "[2.31, 2.37]",
-      "system.openmpi": "[4.1.6, 4.1.6]",
-      "pci-15B3-020D.present": "true",
-      "compatibility-score": 100,
+      "oci.cpu.vendor": "GenuineIntel",
+      "oci.cpu.features": "AVX512FP16,",
+      "oci.kernel.selinux": "false",
+      "oci.kernel.configurations": "PREEMPT,",
+      "oci.kernel.versions": "[4.19, 5.16)",
+      "oci.os.glibc": "[2.31, 2.37]",
+      "oci.os.openmpi": "[4.1.6, 4.1.6]",
+      "oci.pci.devices": "15B3.020D,",
+      "oci.compatibility-score": 100,
     },
     {
-      "cpu-model.vendor_id": "AuthenticAMD",
-      "cpu-cpuid.FPHP": "true",
-      "kernel-selinux.enabled": "false",
-      "kernel-config.PREEMPT": "true",
-      "kernel-version.full": "[4.19, 5.16)",
-      "system.glibc": "[2.31, 2.37]",
-      "system.openmpi": "[4.1.6, 4.1.6]",
-      "pci-1002-67ff.present": "true",
-      "compatibility-score": 80,
+      "oci.cpu.vendor": "AuthenticAMD",
+      "oci.cpu.features": "FPHP,",
+      "oci.kernel.selinux": "false",
+      "oci.kernel.configurations": "PREEMPT,",
+      "oci.kernel.versions": "[4.19, 5.16)",
+      "oci.os.glibc": "[2.31, 2.37]",
+      "oci.os.openmpi": "[4.1.6, 4.1.6]",
+      "oci.pci.devices": "1002.67ff,",
+      "oci.compatibility-score": 80,
       "annotation": "only work with AMD CPU and AMD GPU"
     }
   ]
 }
 ```
 
-## Alternative place to hold compatibility set
+## Compatibilities Embeded Inside Platform Object
 
-Considering the compatibilities are composed of a list of compatibility set, just similar as the idea in proposal E, the platform.features could be reused.
+### Extend Platform Object with New Compatibilities Field
 
-Each compatibility set will be encoded into a string, then the platform.features can hold all the compatibility artifact content, the downside is the platform.features content is hard to read for human.
+Add a new field in platform object in [image index](https://github.com/opencontainers/image-spec/blob/main/image-index.md#image-index-property-descriptions).
 
-Then it's the image author's(or image provider's) freedom to use standalone artifact or platform.features to express the compatibility requirements, the format will be kept same.
+  - **`platform`** *object*
 
-To reduce the load to registry, if compatibilities are stored in platform.features(a new filed inside comaptibility set can be used to identify this case), no further api request should be sent to registry to discover the comaptibility artifact.
+    This OPTIONAL property describes the minimum runtime requirements of the image.
+    This property SHOULD be present if its target is platform-specific.
 
-## Compatibility and NFD filed labels
+    - **`architecture`** *string*
 
-If the field is required in image compatibility artifact, but does not present in NFD labels, the new feature lable should be discussed and contributed into NFD.
+    - **`variant`** *string*
 
-It's expected that NFD feature lables definition and node feature discovering could be an independent component in NFD, and could be consumed by different consumers.
+    - **`os`** *string*
 
-To avoid over-flexible specification, and avoid abusing the specification, a way to limit the freedom is needed.
+    - **`os.version`** *string*
 
-## Artifact Discovery
+    - **`os.features`** *array of strings*
+
+    - **`features`** *array of strings*
+
+    - **`compatibilities`** *list of map*
+
+      This new OPTIONAL property describes a list of compatibility sets, contains at least one compatibility set. Same definition as that in Image Compatibility Spec.
+
+### Migration and Deprecation
+
+The platform.os.version, platform.os.features and platform.features are expected to be migrated to platform.compatibilites fields.
+
+It may take years for the migration.
+
+The deprecation for these fields will start with pre-notification and migration transition period.
+
+Before all runtimes' migration finished, these fields should still be valid.
+
+## Flexibility for Different Purpose
+
+It's the image author's (or image provider's) freedom to use standalone artifact or platform.compatibilities to express the compatibility requirements, the format will be kept same.
 
 The subject field should be used to associate the compatibility artifact with target image. The referrers API should be used to discover artifacts.
 
 The client will query for an artifact using the referrers response, selecting the entry with a matching artifactType and the most recent "created" timestamp.
+
+If platform.compatibilities is detected and not empty, then runtime is not required to send referrs API to query compatibility artifact.
+
+If there is no platform.compatibilities, or the content of platform.compatibilities is  empty, then runtime should send referrs API to registry to query compatibility artifact.
+
+## Pros. and Cons. Comparation
+
+### Pros. and Cons. of Compatibility Artifact
+
+It's possible to update compatibility independently without having to re-release and re-distribute image.
+
+In some vertical industries, re-distributing image means repeating release cycle to production site, it may take several weeks to several months for complex applications, very time consuming and high cost.
+
+The application using new image has to pass series tests inside vendor's lab and then customer's lab, and then roll out in production site gradually. Tests may include function, performance, reliability, security, inter-working etc.
+
+The cons. of compatibility artifact is, if it's used for image selection or scheduling decision, additional referrs API request should be sent to registry.
+
+### Pros. and Cons. of platform.compatibilities
+
+Obviously current API interaction with registry can retrieve the compatibility requirements directly, no additional referrs API request is needed.
+
+Modification to the platform.compatibilities will alter the image index content.
+
+Image shipping usually will try to ensure the integrity of the image, and prevent unauthorized tampering. Image index content update will require re-distribute the image for supply chain security.
+
+## Compatibility and NFD filed labels
+
+The proposal itself does not intend to define concrete compatibility field labels, it should be a task for separate proposals.
+
+To free the tools implementation, and make sure the existing os.version, os.features, platform.features can be easily migrated and smoothly deprecated, it's reasonable that minimal set of OCI compatibility fields should be defined in OCI.
+
+These field labels could be easily mapped or translated to NFD field labels.
+
+Because the value of compatibility field SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different, NFD labels are dynamicly created according to node features, it's not one to one mapping.
+
+For example, oci.kernel.configurations may containes serveral boot configurations in a single string, but in NFD, different lables like kernel-config.PREEMPT, kernel-config.intel_iommu may be applied.
+
+If the field is required in image compatibilities, but does not present in NFD labels, the new feature lable should be discussed and contributed into NFD.
+
+It's expected that NFD feature lables definition and node feature discovering could be an independent component in NFD, and could be consumed by different consumers.
+
+SHOULD customized compatibility field labels be allowed in different industry? It's an open topic.
+
+To avoid over-flexible specification, and avoid abusing the specification, a way to limit the freedom is needed.
 
 ## Requirements
 
