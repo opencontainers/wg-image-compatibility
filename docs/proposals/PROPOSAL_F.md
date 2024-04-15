@@ -12,7 +12,7 @@ This is a slimmed down, simpler version of [Proposal D](PROPOSAL_D.md). It is in
 
 Compatibility metadata, and specifically external artifacts that are parsed by different plugins intended for diverse environments, can satisfy many use cases. The following are examples.
 
-- **scheduling**: Schedulers need to see image compatibility metadata to make decisions. Having the metadata only available in the image manifest (at the image selection or pulling phase) does not satisfy this use case, which needs to retrieve metadata for one or more images apriori. The external artifact structure works well here, as scheduling communities could easily use external artifacts with external plugins to inform their schedulers. In HPC the example use case is Flux Framework, a graph-based scheduler that would define different resource subsystems in a graph (for image compatibility metadata to match to) and in Kubernetes an example use case is Node Feature Discovery (NFD) that would warrant wanting their annotations ascribed to images.
+- **scheduling**: Schedulers need to see image compatibility metadata to make decisions. Having the metadata only available in the image manifest (controlled by way of OCI) is severely limiting to niche communities that might need additional (less common) information for scheduling. An example comes from the HPC community with MPI.
 
 - **image selection**: is a use case only in that the tool selecting the image does not eventually adopt one of the simpler proposals [A](PROPOSAL_A.md) or [E](PROPOSAL_E.md), or has use case that is not addressed by a traditional container runtime pulling the image (and using image manifest metadata).
 
@@ -29,7 +29,7 @@ In [Proposal B](PROPOSAL_B.md) it is stated that a compatibility artifact should
 
 ### Artifact Manifest
 
-This artifact MAY have a manifest that references it with the media type that is specific to the compatibility interest group. For example, metadata for node feature discovery may take the following form:
+This artifact MAY have a manifest that references it with the compatibility artifact media type. For example:
 
 ```json
 {
@@ -43,7 +43,7 @@ This artifact MAY have a manifest that references it with the media type that is
   },
   "layers": [
     {
-      "mediaType": "application/k8s.nfd.image-compatibility.spec.v1+json",
+      "mediaType": "application/vnd.oci.image-compatibility.spec.v1+json",
       "digest": "sha256:4a47f8ae4c713906618413cb9795824d09eeadf948729e213a1ba11a1e31d052",
       "size": 1710
     }
@@ -56,54 +56,120 @@ This artifact MAY have a manifest that references it with the media type that is
 
 ### Artifact
 
-The artifact is a simple json structure of named groups and within them, key value pairs. The groups can provide a higher level organization, such as types of features or even versions. This organization is up to the compatibility interest group. Here is an example organizing NFD annotations within extractor groups (a random selection):
+The artifact is a simple json structure under the top level key "compatibilities" of named groups and within them, key value pairs, where it is strongly suggested that each top level key refers to a compatibility group. Each compatibility special interest group that maintains an underlying namespace can choose the specific key value pairs within. Here is an example with NFD annotations. Note that the specific identifier for NFD is likely more complex than just "nfd" (e.g., io.kubernetes.nfd):
 
 ```json
 {
   "compatibilities": {
-    "cpu": {
+    "nfd": {
       "cpu-hardware_multithreading": true,
       "cpu-pstate.status": "passive",
       "cpu-pstate.turbo": false
-    },
-    "kernel": {
       "kernel-selinux.enabled": true,
       "kernel-version.major": 4           
-    },
-    "memory": {
       "memory-numa": true,
       "memory-nv.dax": true
-    },
-    "network": {
       "network-sriov.capable": true,
       "network-sriov.configured": true
     }
 }
 ```
 
+The artifact above shows just one section. Artifacts can include as many sections as desired.
 A similar spec for an HPC-oriented container might look like the following:
 
 ```json
 {
   "compatibilities": {
-    "cpu": {
+    "io.archspec": {
       "target": "arm64",
     },
-    "mpi": {
-      "implementation": "openmpi",
-      "version": "4.1.6"           
-    },
-    "gpu": {
-      "enabled": true
-    },
-    "os": {
-      "vendor": "rocky",
-      "version": "8"
+    "org.supercontainers": {
+      "mpi.implementation": "openmpi",
+      "mpi.version": "4.1.6"           
     }
 }
 ```
 
 As stated previously, the granularity of metadata provided is up to the compatibility interest group. The degree to which each metadata attribute is used is up to the plugin or tool within the context of a specific use case.
+
+## Requirements
+
+Taken from [REQUIREMENTS](../REQUIREMENTS.md). Points that have:
+
+- `TOOL RESPONSIBILITY` would be possible by a custom tool.
+- `AGNOSTIC`: the proposal is agnostic to the specific point (can be decided by working group)
+
+### Image Author
+
+- [x] As an image author, I want to update compatibility independently without having to re-release and re-distribute my image.
+- [x] As an image author, I want to have the freedom to express any compatibility that is necessary for my container to run on the host.
+  - [x] Including conditional compatibility, such as a container running on AMD CPU and intel CPU having different requirements.
+  - [x] Including must have/nice to have compatibility.
+  - [x]  Matching finer grain platform definitions.
+- [x] As an image author, I want to use a provided tool to verify the compatibility spec I wrote against the schema.
+- [ ] As an image author, I would like to create a single compatibility description that is common to a group of images (`TOOL RESPONSIBILITY`).
+- [ ] As an image author, I want to be able to specify in my manifest that my multi-platform image has a compatibility spec which should be consulted `AGNOSTIC`.
+- [ ]  As an image author, I want to be able to include compatibility specifications from base layers that I inherited from `TOOL RESPONSIBILITY` that can derive path of base layers
+- [x] As an image author, I want to ensure that runtimes without image compatibility gracefully fall back to running a usable image.
+
+### Domain Architect
+
+- [x] As a domain architect I want a process to share my knowledge about \<niche topic\> compatibility with some compatibility interest group.
+- [x] As a domain architect I don't want to have to understand containers or develop tools for them to share this knowledge.
+
+### Tool Writer
+
+- [x] As a tool writer, I want to get the compatibility spec without pulling the image layer blobs.
+- [x] As a tool writer, I would like to have a library for reading image compatibility so that I can write my own software that takes action based on the spec, e.g.:
+  - [x] custom k8s scheduler, admission webhooks, runtime classes etc.
+- [x] As a tool writer, compatibility validation could be integrated into non-runtime tools.
+- [x] As a tool writer, I want to be able to write tools (that use compatibility specs) that have non-standard applications (e.g., checking individual layers).
+
+### System Runtime Administrator
+
+- [x] As a system runtime administrator, I want to check whether a container is compatible with the nodes I am going to run it on using the provided tool.
+- [x] As a system runtime administrator, I would like to fetch additional documentation for understanding specific settings in the compatibility spec.
+- [ ] As a system runtime administrator, selecting which image to run should only require pulling the Index manifest, and parsing the descriptors listed.
+  Additional API calls to the registry should not be required.
+- [ ] As a system runtime administrator, I want to validate whether all running applications in the cluster are compatible with a new operating system (or new operating system version) or not before migrating. `TOOL RESPONSIBILITY`
+- [ ] As a system runtime administrator, I want to validate whether all running applications in the cluster are compatible with new hardware (cpu, gpu, nic etc.) or not before migrating `TOOL RESPONSIBILITY`.
+- [ ] As a system runtime administrator, I want to use annotations to schedule for the appropriate resources (we do not have annotations, we have metadata attributes in the artifact).
+- [x] As a system runtime administrator, the runtime should not need to know about all possible types of hardware.
+- [ ] Perhaps hooks could be added for users to inject their own image selection criteria on a given host, or annotations could be injected `TOOL RESPONSIBILITY`.
+
+### Deployment Engineer
+
+- [ ] As a deployment engineer, I want to parse an image index and find the “optimal” image for the cluster node I am aiming to run the image on `AGNOSTIC`.
+That includes being able to:
+  - Discover the image that fits the selected host.
+  - Find the best match from the nodes and images I have available.
+  - Determine that the image is not fitting the selected host.
+- [x] As a deployment engineer, I want the image compatibility check to be performed without downloading or executing the referenced image layers.
+- [x] As a deployment engineer, I should be able to add the compatibility to images already being used in production, especially for the images released before image compatibility wg was created.
+- [x] As a deployment engineer, I want to be able to specify the version and variant of an application or other user specific configuration (e.g. MPI), and not only hardware/kernel details in the compatibility specification.
+- [ ] As a deployment engineer, I want my compatibility spec runtime to be able to select the best possible runtime available on a node (e.g. runc vs nvidia vs wasm) `TOOL RESPONSIBILITY`
+- [x] As a deployment engineer, I want to be able to rank the images in a multi-platform image so that the runtime can know which one to choose when more than one image is compatible with the runtime environment.
+- [x] As a deployment engineer, I want to reuse community projects so that I don't duplicate and integrate the functionality of the already existing tools.
+
+### Registry Maintainer
+
+- [x] As a registry user or operator I want to have a common way of inspecting information about image compatibility to enable users to find an image that best matches their system.
+- [x] As a registry operator (or user that has no control over their registry implementation), I want any compatibility changes to not depend on registry server changes or upgrades.
+
+### OCI Specification Maintainer
+
+- [x] As a spec maintainer, I want the solution to avoid breaking other specs (confidential images, image signing, existing implementations for runtimes picking images).
+- [x] As a spec maintainer, I don't want the spec to update for new hardware devices, kernel releases, or other external dependencies.
+- [x] As a spec maintainer, I don't want to overlap significantly with solutions from other specs (like SBOMs).
+
+### Security Administrator
+
+- [x] As a security administrator, I want predictable behavior from runtimes, which does not change based on unsigned content. _(runtimes should ignore unsigned or untrusted artifacts if signed images are required, even if the image itself is signed by a trusted authority)_
+- [x] As a security administrator, I want to ensure the compatibility spec cannot be used to escalate privileges beyond what is requested by the deployment engineer.
+- [x] As a security (or more generally, XYZ) researcher, I want to annotate a container (separately) with my niche jargon of metadata.
+- [x] As a security administrator, I want to know that image compatibility cannot be used to circumvent image signing.
+- [ ] As a security administrator I want to catalog SBOMs of compatible images to put into a report about software used by my group / institution `TOOL RESPONSIBILITY`
 
 ## References
 
