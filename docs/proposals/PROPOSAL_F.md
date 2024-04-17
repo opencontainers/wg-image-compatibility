@@ -48,11 +48,15 @@ This artifact MAY have a manifest that references it with the compatibility arti
       "size": 1710
     }
   ],
-  "annotations": {
-    "oci.opencontainers.image.created": "2024-01-02T03:04:05Z"
+  "subject": {
+    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+    "digest": "sha256:5b0bcabd1ed22e9fb1310cf6c2dec7cdef19f0ad69efa1f392e94a4333501270",
+    "size": 7682
   }
 }
 ```
+
+Note that the subject points to the original image that the artifact describes.
 
 ### Artifact
 
