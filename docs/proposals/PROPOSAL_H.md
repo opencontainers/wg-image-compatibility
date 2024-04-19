@@ -46,6 +46,11 @@ The artifact manifest contains ONLY one blob.
       }
     }
   ],
+  "subject": {
+    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+    "digest": "sha256:5b0bcabd1ed22e9fb1310cf6c2dec7cdef19f0ad69efa1f392e94a4333501270",
+    "size": 7682
+  },
   "annotations": {
     "oci.opencontainers.image.created": "2024-03-27T08:08:08Z"
   }
