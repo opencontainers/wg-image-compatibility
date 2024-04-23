@@ -28,7 +28,8 @@ This would replace that text with:
 > This OPTIONAL property specifies an array of strings, each specifying a mandatory feature that implementations SHOULD understand.
 > Feature values may be architecture specific.
 
-There would also be a table of known features per architecture, possibly with links to specifications.
+There would also be a table of known features or links to specifications, similar to how [platform variants](https://github.com/opencontainers/image-spec/blob/main/image-index.md#platform-variants) are defined.
+A possible source for known features is the [golang.org/x/sys/cpu](https://pkg.go.dev/golang.org/x/sys/cpu) package, where  each feature could be the string after `Has` in the struct for the given platform (converting to lowercase).
 
 An example would also be added to the Image Index:
 
@@ -53,6 +54,7 @@ An example would also be added to the Image Index:
       "platform": {
         "architecture": "amd64",
         "os": "linux",
+        "variant": "v2",
         "features": [ "avx2", "bmi2" ]
       }
     }
@@ -61,7 +63,7 @@ An example would also be added to the Image Index:
 ```
 
 In the above scenario, the generic `linux/amd64` entry is listed first and should be used by default.
-Runtimes that recognize and support the `avx2` AND `bmi2` features would prefer the second entry as a better match.
+Runtimes that recognize and support the `avx2` AND `bmi2` features on a "v2" or newer variant would prefer the second entry as a better match.
 Images that require one of a combination of features would have an index entry per supported combination of features, referencing the same image digest.
 
 ## Requirements
