@@ -109,7 +109,7 @@ Schema:
 
       The value type of this field is INT.
 
-    - **`annotation field`**
+    - **`description field`**
 
       This OPTIONAL property is a field to describe human-readable information regarding to the compatibility set.
 
@@ -141,7 +141,7 @@ All fields in this section are only for examples.
       "oci.kernel.versions": "[4.19, 5.16)",
       "oci.os.glibc": "[2.31, 2.37]",
       "oci.pci.devices": "1002.67ff",
-      "annotation": "only work with AMD CPU and AMD GPU"
+      "description": "only work with AMD CPU and AMD GPU"
     }
   ]
 }
@@ -184,7 +184,7 @@ All fields in this section are only for examples.
       "oci.os.openmpi": "[4.1.6, 4.1.6]",
       "oci.pci.devices": "1002.67ff,",
       "oci.compatibility-score": 80,
-      "annotation": "only work with AMD CPU and AMD GPU"
+      "description": "only work with AMD CPU and AMD GPU"
     }
   ]
 }
@@ -195,8 +195,6 @@ All fields in this section are only for examples.
 ### Extend Platform Object with New Compatibilities Field
 
 Add a new field in platform object in [image index](https://github.com/opencontainers/image-spec/blob/main/image-index.md#image-index-property-descriptions).
-
-The compatibilities author should be aware that the maximal size of image index is 4 MiB.
 
 - **`manifests`** _array of objects_
 
@@ -220,6 +218,14 @@ The compatibilities author should be aware that the maximal size of image index 
     - **`compatibilities`** _array of string-string maps_
 
       This new OPTIONAL property describes a list of compatibility sets, contains at least one compatibility set. Same definition as that in Image Compatibility Spec.
+
+      The size limitation 4MiB for image manifest is defined in image distribution spec.
+
+      That also means the size of image index should not exceed 4 MiB, the tools that edit the compatibilities SHOULD deduplicate unnecessary compatibility fields.
+
+      Registry may store manifests in a separate database from the blobs, to serve for frequent access of small but often queried and changing data, large compatibilities and the number of images embededed with compatibilities will change the load pattern to a registry.
+
+      The field label definition should consider the size limitation of image index.
 
 ### Deprecation Path
 
@@ -249,21 +255,39 @@ If there is no platform.compatibilities, or the content of platform.compatibilit
 
 It's possible to update compatibility independently without having to re-release and re-distribute image.
 
+Becasue artifact can be associated with the target image in on-demand mode, the compatibility artifact can be delivered separately from the image package.
+
 In some vertical industries, re-distributing image means repeating release cycle to production site, it may take several weeks to several months for complex applications, very time-consuming and high cost.
 
 The application using new image has to pass series tests inside vendor's lab and then customer's lab, and then roll out in production site gradually. Tests may include function, performance, reliability, security, inter-working etc.
+
+There is no size limitation on compatibility content.
+
+The compatibility artifact can be independent from the runtime running containers, the cluster, including nodes labeling, can be prepared based on images' compatibility artifact before running process.
 
 The cons. of compatibility artifact is, if it's used for image selection or scheduling decision, additional referrers API request should be sent to registry.
 
 When the compatibility artifact is used for validation purpose, it can be processed without runtime image selection or scheduling decision being involved.
 
+If the compatibility artifact is updated with hardwares and/or OS features, or the image manifest digest is updated, the delivered compatibility artifact and image should be reviewed, tested and validated, both in vendor and customer labs.
+
+If compatibility artifact is to be updated and image manifest digest does not change, if the updated artifact is validated that it's compatible with existing running enironment, then the image does not need to do all tests against existing running environment.
+
 ### Pros. and Cons. of platform.compatibilities
 
 Obviously current API interaction with registry can retrieve the compatibility requirements directly, no additional referrers API request is needed.
 
+There is size limitation for image index, the number of entries in the list of manifests, the number of fields inside platform.compatibilites, are varied on image by image.
+
+It's diffifult to set size limitation on platform.comaptibilites.
+
 Modification to the platform.compatibilities will alter the image index content.
 
+Platform object is usually considered as part of multi-architectures image deliverable.
+
 Image shipping will usually try to ensure the integrity of the image, and prevent unauthorized tampering, thus image index content update will require re-distribute the image for supply chain security.
+
+It's possible to update the platform.compatibilities independently from the image, if the image manifest digest does not change, it should be reviewed and tested in same way as compatibility artifact.
 
 ## Compatibility and NFD filed labels
 
