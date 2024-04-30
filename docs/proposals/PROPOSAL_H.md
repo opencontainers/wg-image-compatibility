@@ -219,23 +219,7 @@ Add a new field in platform object in [image index](https://github.com/openconta
 
       This new OPTIONAL property describes a list of compatibility sets, contains at least one compatibility set. Same definition as that in Image Compatibility Spec.
 
-      The size limitation 4MiB for image manifest is defined in image distribution spec.
-
-      That also means the size of image index should not exceed 4 MiB, the tools that edit the compatibilities SHOULD deduplicate unnecessary compatibility fields.
-
-      Registry may store manifests in a separate database from the blobs, to serve for frequent access of small but often queried and changing data, large compatibilities and the number of images embededed with compatibilities will change the load pattern to a registry.
-
-      The field label definition should consider the size limitation of image index.
-
-### Deprecation Path
-
-The platform.os.version, platform.os.features and platform.features are expected to be moved to platform.compatibilities fields.
-
-The old usage of these fields is deprecated at some point, but that's often reactionary after popular builders stop using these fields.
-
-Backwards compatibility or graceful degradation should be ensured for these fields where possible with either old images, old builders, and/or old runtimes.
-
-It may take years for the deprecation.
+      Because of limits on the size of manifests, tools building the index SHOULD include only the unique capabilities needed to distinguish from other entries in the index.
 
 ## Flexibility for Different Purpose
 
@@ -255,11 +239,7 @@ If there is no platform.compatibilities, or the content of platform.compatibilit
 
 It's possible to update compatibility independently without having to re-release and re-distribute image.
 
-Becasue artifact can be associated with the target image in on-demand mode, the compatibility artifact can be delivered separately from the image package.
-
-In some vertical industries, re-distributing image means repeating release cycle to production site, it may take several weeks to several months for complex applications, very time-consuming and high cost.
-
-The application using new image has to pass series tests inside vendor's lab and then customer's lab, and then roll out in production site gradually. Tests may include function, performance, reliability, security, inter-working etc.
+Because artifact can be associated with the target image in on-demand mode, the compatibility artifact can be delivered separately from the image package.
 
 There is no size limitation on compatibility content.
 
@@ -267,35 +247,27 @@ The compatibility artifact can be independent from the runtime running container
 
 The cons. of compatibility artifact is, if it's used for image selection or scheduling decision, additional referrers API request should be sent to registry.
 
+This will cause slower deployments and rate limits may be exceeded on registry access.
+
+As a result, runtime implementations may choose not to support using the compatibility artifact for image selection, or they may limit how often a previously pulled image is queried for an updated compatibility artifact.
+
 When the compatibility artifact is used for validation purpose, it can be processed without runtime image selection or scheduling decision being involved.
-
-If the compatibility artifact is updated with hardwares and/or OS features, or the image manifest digest is updated, the delivered compatibility artifact and image should be reviewed, tested and validated, both in vendor and customer labs.
-
-If compatibility artifact is to be updated and image manifest digest does not change, if the updated artifact is validated that it's compatible with existing running enironment, then the image does not need to do all tests against existing running environment.
 
 ### Pros. and Cons. of platform.compatibilities
 
-Obviously current API interaction with registry can retrieve the compatibility requirements directly, no additional referrers API request is needed.
+Runtime image selection can use their existing workflow of pulling the index, finding the matching platform, and pulling that specific platform image, without any additional API calls.
 
-There is size limitation for image index, the number of entries in the list of manifests, the number of fields inside platform.compatibilites, are varied on image by image.
+Changes to the compatibility are published with a new digest on the index, which can trigger the appropriate workflows, including image signing, testing, and updating deployments.
 
-It's diffifult to set size limitation on platform.comaptibilites.
+Platform.compatibilities needs to conform the size limits on image index too.
 
-Modification to the platform.compatibilities will alter the image index content.
-
-Platform object is usually considered as part of multi-architectures image deliverable.
-
-Image shipping will usually try to ensure the integrity of the image, and prevent unauthorized tampering, thus image index content update will require re-distribute the image for supply chain security.
-
-It's possible to update the platform.compatibilities independently from the image, if the image manifest digest does not change, it should be reviewed and tested in same way as compatibility artifact.
+A change in the platform.compatibilities and the artifact is treated as the same level of risk and either test both equally or equally allow the change without testing.
 
 ## Compatibility and NFD filed labels
 
 The proposal itself does not intend to define concrete compatibility field labels, it should be a task for separate proposals.
 
-To free the tools' implementation, and make sure the existing os.version, os.features, platform.features can be smoothly deprecated, and reduce the sync. effort between OCI and NFD, it's reasonable just to define minimal set of OCI compatibility fields.
-
-These field labels could be easily mapped or translated to NFD field labels.
+There is a considerable overlap in functionality between NFD and the compatibility spec which may be managed by mapping some NFD fields to OCI compatibility fields.
 
 Because the value of compatibility field SHOULD be described in contiguous or discontinuous range if the value discovered on nodes can be different, NFD labels are dynamically created according to node features, it's not one to one mapping.
 
