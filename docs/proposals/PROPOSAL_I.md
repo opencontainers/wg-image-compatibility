@@ -1,10 +1,10 @@
-# Proposal I - compatibilities extention in platform object
+# Proposal I - compatibilities extension in image index platform and image manifest config
 
 This proposal is born from proposal A to H.
 
-The purpose of the proposal, based on the maintainers feedback, is to address the concern maintaining standalone artifact in OCI.
+The purpose of the proposal, based on the maintainers feedback, is to address the concern maintaining a standalone artifact specification in OCI.
 
-## image spec platform object extention
+## image spec platform object extension
 
 ### revive platform.features
 
@@ -33,7 +33,7 @@ Add a new descriptor in platform object in [image index](https://github.com/open
 
     - **`features`** _array of strings_
 
-    - **`compatibilities`** _[descriptor](https://github.com/opencontainers/image-spec/blob/main/descriptor.md)_
+    - **`compat`** _[descriptor](https://github.com/opencontainers/image-spec/blob/main/descriptor.md)_
 
       This OPTIONAL property specifies a descriptor of a compatibilities manifest.
 
@@ -57,7 +57,7 @@ The compatibilities manifest is a special image manifest, contains only config a
 }
 ```
 
-### Config Extention
+### Config Extension
 
 The config object will be extened with compatibilities field.
 
@@ -105,14 +105,12 @@ The required rootfs COULD be empty if the config contains compatibilities field.
 
 All labels in this section are only for examples.
 
-#### Example - image is compatible with different hardware combinations
+For example image is compatible with different hardware combinations
 
 ```json
 {
     "created": "2024-06-11T22:22:56.015925234Z",
     "author": "ChaoyiHuang<joehuang.sweden@gmail.com>",
-    "architecture": "amd64",
-    "os": "linux",
     "config": {
         "compatibilities": [
             {
@@ -139,17 +137,19 @@ All labels in this section are only for examples.
 
 ## Major concerns to address
 
-No new standard to maintain, just extention on existing specification.
+The path to retrieve compatibilities is: image index -> image-manifest entry -> compat descriptor -> image manifest for compatibilities -> config descriptor -> config -> compatibilities.
 
-Reduce the size of image index considering the 4MB size limitation.
+No new standard to maintain, just extension on existing specification.
 
-Update image index entry to new compatibilities manifest without rebuild image.
+Reduce the risk of image index size exceeding 4MB size limitation.
+
+Update the compat descriptor in image index manifest entry to the new compatibilities manifest without rebuild image.
 
 Image compatibilites validation can be done without runtime engine involved.
 
 Runtime engine can be configured whether to pull compatibilites manifest, and whether to validate the compatibilites in container lifecycle flow.
 
-OCI only maintains common interest compatibility label.
+OCI only maintains common interest compatibility labels.
 
 ## Compatibility and NFD filed labels
 
